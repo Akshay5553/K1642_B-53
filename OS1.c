@@ -61,7 +61,7 @@ void main()
 {
  int n,i;
  pthread_t th1,th2,th3;
- printf("Enter size of array:");
+ printf("Enter size of array and should be less than 30:");
  scanf("%d",&n);
  for(i=0;i<n;i++)
  {
