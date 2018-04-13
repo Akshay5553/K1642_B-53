@@ -1,111 +1,77 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include <errno.h>
-#define handle_error_en(en, msg) \
-        do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)   //(malloc statement//
-volatile int r_t = 0;
-pthread_t thread[3]; 
-int N_E;
-struct Output{	
-	int minimum;
-	int maximum;
-	int avg;
-}Output;
-void *findminimum(void *array_ptr){	
-	int i; 	
-	int *elements = (int*)array_ptr; 
-	Output.minimum = elements[0]; 
-	for(i = 0; i < N_E; i++){	
-		if(elements[i] < Output.minimum){	
-			Output.minimum = elements[i];		
-		}	
-	}
-	r_t -= 1;	
-return NULL;
+#include<stdio.h>
+#include<sys/types.h>
+#include<fcntl.h>
+#include<pthread.h>
+int a[30];
+int sizeOfArray;
+//function for Avg 
+
+//function for  Max
+void max(int a[])
+{
+sleep(1);
+ int i,j,temp;
+ for(i=0;i<sizeOfArray;i++)
+ {
+  for(j=0;j<sizeOfArray-i-1;j++)
+  {
+    if(a[j+1]<a[j])
+    {
+       temp= a[j];
+       a[j]=a[j+1];
+       a[j+1]=temp;
+    }
+  }
+ }
+ printf("\nThe maximum value is %d ", a[sizeOfArray-1]);
 }
-void *findmaximum(void *array_ptr){	
-	int i;	
-	int *elements = (int*)array_ptr;  	
-	for(i = 0; i < N_E; i++){	
-		if(elements[i] > Output.maximum){	
-			Output.maximum = elements[i];
-		}
-	}
-	r_t -= 1;	
-return NULL;
+
+//function for Min
+void min(int a[])
+{
+sleep(1);
+
+ int i,j,temp;
+ for(i=0;i<sizeOfArray;i++)
+ {
+  for(j=0;j<sizeOfArray-i-1;j++)
+  {
+    if(a[j+1]<a[j])
+    {
+       temp= a[j];
+       a[j]=a[j+1];
+       a[j+1]=temp;
+    }
+  }
+ }
+ printf("\nThe minimum value is %d", a[0]);
 }
-void *findavg(void *array_ptr){
-		int i;	 
-	int *elements = (int*)array_ptr; 	
-	for(i = 0; i < N_E; i++){		
-		Output.avg += elements[i];		
-	}
-	Output.avg = Output.avg/N_E;
-	r_t -= 1;	
-return NULL;
+void avg(int a[])
+{
+ int i,sum=0,avg;
+ for(i=0;i<sizeOfArray;i++)
+ {
+  sum=sum+a[i];
+ }
+ avg = sum/sizeOfArray;
+ printf("The Average value is %d",avg);
 }
-int getArrayInput(int n, int *array_ptr){		
-		int a;
-		int numberOfElements = 0;
-    	printf("Creating Dynamic Array...\n-\n");
-		for(;;){  
-    		printf("Enter a positive value:\nNegative Number to Stop\n-\n");
-  			if (scanf("%d",&a) != 1){
-				printf("\nOops that wasn't an Integer\nlets try filling the array again\nRemember INTEGERS only!\n");
-				exit(EXIT_FAILURE);
-			}
-    		if (a >= 0){ 
-       		 	if (numberOfElements == n){
-          	  	  n += 1; 
-            		  array_ptr = realloc(array_ptr, n * sizeof(int));
-       			 }
-        		array_ptr[numberOfElements++] = a;    
-    		} else {        
-       		 printf("\nNumber of Integers: %d\n", numberOfElements);
-       		 break;
-   				 }
-			}
-	return numberOfElements;
-		}
-void joinThreads(int numberOfThreads){
-	int i; 
-	int s; 
-	while(numberOfThreads >= 0){
-		s = pthread_join(thread[numberOfThreads], NULL);
-		 if (s != 0){
-			 handle_error_en(s, "pthread_create");
-		 }
-		 numberOfThreads--;
-	}
-}
-void createThreads(int *array_ptr){
-	int s; 
-  	s = pthread_create(&thread[0], NULL, findminimum, (void *)array_ptr);
-	 if (s != 0){
-			handle_error_en(s, "pthread_create");
-		 }
-		 	r_t += 1;
-	 s = pthread_create(&thread[1], NULL, findmaximum, (void *)array_ptr);
-		 if (s != 0){        
-            handle_error_en(s, "pthread_create");       	
-       	 }
-        	 r_t += 1;
-	 s = pthread_create(&thread[2], NULL, findavg, (void *)array_ptr);	 		 
-		 if (s != 0){
-           handle_error_en(s, "pthread_create");
-       	 }
-			r_t += 1;
-}
-int main(){
-	int n = 1; 
-	int *array_ptr = malloc(n * sizeof(int));
-		 N_E = getArrayInput(n, array_ptr);		
-		 createThreads(array_ptr);		
-	    	while(r_t>0){		
-				sleep(1);
-			}
-		joinThreads(2);
-		printf("\nThe average is %d\nThe maximum is %d\nThe minimum is %d\n",Output.avg, Output.maximum, Output.minimum);
-	return(0);
+//main
+void main()
+{
+ int n,i;
+ pthread_t th1,th2,th3;
+ printf("Enter size of array:");
+ scanf("%d",&n);
+ for(i=0;i<n;i++)
+ {
+ scanf("%d",&a[i]);
+ }
+ sizeOfArray = n;
+ pthread_create(&th1,NULL,avg,&a);
+ pthread_create(&th2,NULL,max,&a);
+ pthread_create(&th3,NULL,min,&a);
+ pthread_join(th1,NULL);
+ pthread_join(th2,NULL);
+ pthread_join(th3,NULL);
 }
