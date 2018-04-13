@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <errno.h>
 #define handle_error_en(en, msg) \
-        do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)   
+        do { errno = en; perror(msg); exit(EXIT_FAILURE); } while (0)   //(malloc statement//
 volatile int r_t = 0;
 
 pthread_t thread[3]; 
